@@ -6253,6 +6253,8 @@ in
 
   rescuetime = libsForQt5.callPackage ../applications/misc/rescuetime { };
 
+  resholved = callPackage ../development/misc/resholved { };
+
   reuse = callPackage ../tools/package-management/reuse { };
 
   rewritefs = callPackage ../os-specific/linux/rewritefs { };
