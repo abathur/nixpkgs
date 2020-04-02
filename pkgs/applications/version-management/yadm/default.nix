@@ -1,30 +1,48 @@
-{ stdenv, fetchFromGitHub, git, gnupg }:
+{ stdenv, fetchFromGitHub, resholved, coreutils, bash, hostname, git, gnupg, gnutar }:
 
 let version = "2.4.0"; in
-stdenv.mkDerivation {
+resholved.buildResholvedPackage {
   pname = "yadm";
   inherit version;
 
-  buildInputs = [ git gnupg ];
-
+  # I patched a (valid) syntax in yadm that is tripping the oil parser up
+  # so that I can try to just upstream that fix soon.
   src = fetchFromGitHub {
-    owner  = "TheLocehiliosan";
+    owner  = "abathur";
     repo   = "yadm";
-    rev    = version;
-    sha256 = "0kpahznrkxkyj92vrhwjvldg2affi1askgwvpgbs4mg40f92szlp";
+    rev    = "0f19917be4b4c62367e4b719959aa90590efea09";
+    sha256 = "11b6dw6fpjgmpz86yi0vasbbkiak5k2mlmn8jmwzx8vm9997vacs";
+  };
+
+  scripts = [ "yadm" ];
+  inputs = [ coreutils bash hostname git gnupg gnutar ];
+  allow = {
+    unresholved_inputs = [
+      # resholved doesn't really understand parameters at the moment
+      # it's assuming parameter 2 to "command" is always <commandname>
+      # I haven't quite decided how to handle this; but for demo
+      # I'm just exempting the flag
+      "-v"
+
+      # This is some windows/cygwin thing. I didn't really anticipate this.
+      # It doesn't look like it's available in Nix, so I added the concept of
+      # "unresholved_inputs" for allowing some unresolved command-names.
+      "cygpath"
+    ];
+    exec = [ "YADM_BOOTSTRAP" ];
   };
 
   dontConfigure = true;
-  dontBuild = true;
 
   installPhase = ''
     runHook preInstall
-    install -Dt $out/bin $src/yadm
-    install -Dt $out/share/man/man1 $src/yadm.1
-    install -D $src/completion/yadm.zsh_completion $out/share/zsh/site-functions/_yadm
-    install -D $src/completion/yadm.bash_completion $out/share/bash-completion/completions/yadm.bash
+    install -Dt $out/bin yadm
+    install -Dt $out/share/man/man1 yadm.1
+    install -D completion/yadm.zsh_completion $out/share/zsh/site-functions/_yadm
+    install -D completion/yadm.bash_completion $out/share/bash-completion/completions/yadm.bash
     runHook postInstall
   '';
+
 
   meta = {
     homepage = https://github.com/TheLocehiliosan/yadm;
