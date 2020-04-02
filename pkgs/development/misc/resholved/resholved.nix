@@ -8,8 +8,8 @@ in python27.pkgs.buildPythonApplication {
   src = fetchFromGitHub {
     owner = "abathur";
     repo = "resholved";
-    rev = "453f4db2452356aa2d49a9e90e46a034861fcd0d";
-    sha256 = "16d4805cpbv6nq8k67c0m1kiqhcgcgahdf8k9lg7n0nn2k3ymmrh";
+    rev = "9ffb63697502ae3c9f5991f23a38004a7d9d8958";
+    sha256 = "1317y56zsiq1s3vvmnpv0kfccd1xnq7zhasrn2kr16jb2x35y479";
   };
 
   format = "other";
