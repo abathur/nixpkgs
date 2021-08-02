@@ -1,4 +1,12 @@
-{ lib, stdenv, fetchFromGitHub, git, gnupg, installShellFiles }:
+{ lib
+, stdenv
+, fetchFromGitHub
+, git
+, gnupg
+, installShellFiles
+, runCommand
+, yadm
+}:
 
 stdenv.mkDerivation rec {
   pname = "yadm";
@@ -30,6 +38,13 @@ stdenv.mkDerivation rec {
       --zsh completion/zsh/_yadm \
       --bash completion/bash/yadm
   '';
+
+  # passthru.tests = {
+  #   minimal = runCommand "${pname}-test" {} ''
+  #     export HOME=$out
+  #     ${yadm}/bin/yadm init
+  #   '';
+  # };
 
   meta = {
     homepage = "https://github.com/TheLocehiliosan/yadm";
