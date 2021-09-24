@@ -1,11 +1,21 @@
-{ lib, stdenv, fetchurl, unzip, ruby, openssl, makeWrapper }:
+{ lib
+, stdenv
+, resholvePackage
+, fetchurl
+, writeTextFile
+, bash
+, coreutils
+, unzip
+, ruby
+, openssl
+}:
 
-stdenv.mkDerivation rec {
+resholvePackage rec {
   pname = "ec2-ami-tools";
 
   version = "1.5.7";
 
-  nativeBuildInputs = [ makeWrapper unzip ];
+  nativeBuildInputs = [ unzip ];
 
   src = fetchurl {
     url = "https://s3.amazonaws.com/ec2-downloads/${pname}-${version}.zip";
@@ -26,14 +36,29 @@ stdenv.mkDerivation rec {
       mv * $out
       rm $out/*.txt
 
-      for i in $out/bin/*; do
-          wrapProgram $i \
-            --set EC2_HOME $out \
-            --prefix PATH : ${lib.makeBinPath [ ruby openssl ]}
-      done
-
       sed -i 's|/bin/bash|${stdenv.shell}|' $out/lib/ec2/platform/base/pipeline.rb
     '';  # */
+
+  solutions = {
+    scripts = {
+      interpreter = "${bash}/bin/bash";
+      scripts = [
+        "bin/ec2-ami-tools-version"
+        "bin/ec2-bundle-image"
+        "bin/ec2-bundle-vol"
+        "bin/ec2-delete-bundle"
+        "bin/ec2-download-bundle"
+        "bin/ec2-migrate-bundle"
+        "bin/ec2-migrate-manifest"
+        "bin/ec2-unbundle"
+        "bin/ec2-upload-bundle"
+      ];
+      inputs = [ coreutils ruby openssl ];
+      fix = {
+        "$EC2_AMITOOL_HOME" = [ "${placeholder "out"}" ];
+      };
+    };
+  };
 
   meta = {
     homepage = "https://aws.amazon.com/developertools/Amazon-EC2/368";
