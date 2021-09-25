@@ -1,6 +1,14 @@
-{ lib, stdenv, fetchFromGitHub, makeWrapper, spidermonkey_78 }:
+{ lib
+, resholvePackage
+, fetchFromGitHub
+, bash
+, spidermonkey_78
+, coreutils
+, gnugrep
+, gnused
+}:
 
-stdenv.mkDerivation {
+resholvePackage {
   pname = "jsawk";
   version = "1.5-pre";
   src = fetchFromGitHub {
@@ -10,13 +18,34 @@ stdenv.mkDerivation {
     sha256 = "0z3vdr3c8nvdrrxkjv9b4xg47mdb2hsknxpimw6shgwbigihapyr";
   };
   dontBuild = true;
-  nativeBuildInputs = [ makeWrapper ];
   installPhase = ''
     mkdir -p $out/bin
     cp $src/jsawk $out/bin/
-    wrapProgram $out/bin/jsawk \
-      --prefix PATH : "${spidermonkey_78}/bin"
   '';
+  solutions = {
+    jsawk = {
+      interpreter = "${bash}/bin/bash";
+      scripts = [ "bin/jsawk" ];
+      inputs = [
+        spidermonkey_78
+        coreutils
+        gnugrep
+        gnused
+      ];
+      fake = {
+        source = [ "/etc/jsawkrc" "~/.jsawkrc" ];
+      };
+      fix = {
+        "$JSBIN" = [ "js" ];
+      };
+      keep = {
+        source = [ "/etc/jsawkrc" "~/.jsawkrc" ];
+      };
+      execer = [
+        "cannot:${spidermonkey_78}/bin/js"
+      ];
+    };
+  };
 
   meta = {
     description = "Like awk, but for JSON";
