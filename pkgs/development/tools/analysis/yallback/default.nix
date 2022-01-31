@@ -12,8 +12,8 @@ stdenv.mkDerivation rec {
   src = fetchFromGitHub {
     owner = "abathur";
     repo = "yallback";
-    rev = "3acf591cb47f734d6402eb705ee84b89290c01cb";
-    hash = "sha256-KEMyllf0YvElpA/VXyPBQJpzUEjkzDdWHXeGa57WSx4=";
+    rev = "6470d31f735fe922c146b8cd75652159c2469e20";
+    hash = "sha256-FD6UfTAvOi7YZG77mUXBkcD8jNKSe7fgyaQUxmb7JQA=";
   };
 
   buildInputs = [ coreutils bashInteractive ];
