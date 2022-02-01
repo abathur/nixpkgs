@@ -12,7 +12,7 @@ stdenv.mkDerivation rec {
   src = fetchFromGitHub {
     owner = "abathur";
     repo = "yallback";
-    rev = "964ba68997d1bf96a1013b74c5e39644b11fe660";
+    rev = "1277b5792036c2da7c9341f9563f7600c4b331ae";
     hash = "sha256-t+fdnDJMFiFqN23dSY3TnsZsIDcravtwdNKJ5MiZosE=";
   };
 
