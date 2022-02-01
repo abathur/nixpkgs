@@ -7,13 +7,13 @@
 }:
 
 stdenv.mkDerivation rec {
-  version = "0.1.0";
+  version = "0.2.0";
   pname = "yallback";
   src = fetchFromGitHub {
     owner = "abathur";
     repo = "yallback";
-    rev = "540a36b30a29747d10fdc745b1d1bbfb3b32396f";
-    hash = "sha256-HgIu54Te++dAiwX4mKhjpIL+miZdw6tjOljtfUJ+0zw=";
+    rev = "964ba68997d1bf96a1013b74c5e39644b11fe660";
+    hash = "sha256-t+fdnDJMFiFqN23dSY3TnsZsIDcravtwdNKJ5MiZosE=";
   };
 
   buildInputs = [ coreutils bashInteractive ];
