@@ -4,7 +4,10 @@
 , fetchurl
 , perl
 , perlPackages
-, sharnessExtensions ? {} }:
+, writeScript
+, callPackage
+, sharness
+}:
 
 stdenv.mkDerivation rec {
   pname = "sharness";
@@ -24,22 +27,27 @@ stdenv.mkDerivation rec {
 
   makeFlags = [ "prefix=$(out)" ];
 
-  extensions = lib.mapAttrsToList (k: v: "${k}.sh ${v}") sharnessExtensions;
-
-  postInstall = lib.optionalString (sharnessExtensions != {}) ''
-    extDir=$out/share/sharness/sharness.d
-    mkdir -p "$extDir"
-    linkExtensions() {
-      set -- $extensions
-      while [ $# -ge 2 ]; do
-        ln -s "$2" "$extDir/$1"
-        shift 2
-      done
-    }
-    linkExtensions
-  '';
-
   doCheck = true;
+
+  passthru = {
+    tests = callPackage ./test.nix { };
+    withPlugins =
+      sharnessExtensions:
+        /*
+        temporarily set SHARNESS_TEST_SRCDIR because I think this might make
+        it possible for "users" to set this to a location in their code and
+        used unpackaged extensions? But I don't really know.
+        */
+        writeScript "sharness-with-plugins" ''
+          # source the core; srcdir only for load
+          export SHARNESS_TEST_SRCDIR="${sharness}/share/sharness"
+          source ${sharness}/share/sharness/sharness.sh
+          unset SHARNESS_TEST_SRCDIR
+
+          # source the plugins
+          ${builtins.concatStringsSep "\n" (lib.mapAttrsToList (k: v: "source ${v}") sharnessExtensions)}
+        '';
+  };
 
   meta = with lib; {
     description = "Portable shell library to write, run and analyze automated tests adhering to Test Anything Protocol (TAP)";
