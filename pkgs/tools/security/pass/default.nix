@@ -122,6 +122,7 @@ resholve.mkDerivation rec {
         imagemagick
         tree
         diffutils
+        "lib"
         # TODO: I assume linux builds will pop w/o below
       ] ++ lib.optionals waylandSupport [
         wl-clipboard
@@ -166,9 +167,6 @@ resholve.mkDerivation rec {
 
         source = [
           "$extension" # internal, for pass extensions
-          # `make install` bakes $out into the source statement
-          # easier to let it slide than to patch it...
-          "${placeholder "out"}/lib/password-store/platform.sh"
         ];
       };
 
@@ -206,7 +204,7 @@ resholve.mkDerivation rec {
     passmenu = {
       scripts = [ "bin/passmenu" ];
       interpreter = "${bash}/bin/bash";
-      inputs = [ ] ++ lib.optionals waylandSupport [
+      inputs = [ "bin" ] ++ lib.optionals waylandSupport [
         dmenu-wayland
         ydotool
       ] ++ lib.optionals (x11Support && !waylandSupport) [
