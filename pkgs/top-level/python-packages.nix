@@ -4191,6 +4191,7 @@ in {
   itypes = callPackage ../development/python-modules/itypes { };
 
   j2cli = callPackage ../development/python-modules/j2cli { };
+  pycg = callPackage ../development/python-modules/pycg { };
 
   jaconv = callPackage ../development/python-modules/jaconv { };
 

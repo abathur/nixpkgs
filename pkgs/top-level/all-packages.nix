@@ -33597,6 +33597,7 @@ with pkgs;
   musly = callPackage ../applications/audio/musly { };
 
   mynewt-newt = callPackage ../tools/package-management/mynewt-newt { };
+  pycg = with python3Packages; toPythonApplication pycg;
 
   mysides = callPackage ../os-specific/darwin/mysides { };
 
