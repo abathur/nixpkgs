@@ -139,7 +139,7 @@ resholve.mkDerivation rec {
   };
 
   strictDeps = true;
-  nativeBuildInputs = [ makeWrapper ];
+  # nativeBuildInputs = [ makeWrapper ];
 
   # What these replacings do?
   # - Disable the auto-updates (we'll run from a read-only directory);
