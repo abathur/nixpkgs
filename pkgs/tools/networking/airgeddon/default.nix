@@ -169,7 +169,7 @@ resholve.mkDerivation rec {
       interpreter = "${bash}/bin/bash";
       scripts = [
         "bin/airgeddon"
-        # "lib/airgeddon/known_pins.db"
+        "lib/airgeddon/known_pins.db"
         "lib/airgeddon/language_strings.sh"
         "lib/airgeddon/plugins/*"
       ];
