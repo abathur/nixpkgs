@@ -210,7 +210,7 @@ resholve.mkDerivation rec {
         "$known_pins_dbfile" = [ "known_pins.db" ];
 
         # Thank god there is only one plugin
-        # "$file" = [ "${placeholder "out"}/lib/airgeddon/plugins/missing_dependencies.sh" ];
+        "$file" = [ "${placeholder "out"}/lib/airgeddon/plugins/missing_dependencies.sh" ];
       };
       fake.external = [ "apt" "pacman" ] # platform-specific external commands in cross-platform conditionals
         ++ [
