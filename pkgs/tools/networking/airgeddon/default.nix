@@ -205,8 +205,8 @@ resholve.mkDerivation rec {
         "$AIRGEDDON_MDK_VERSION" = [ "mdk4" ];
         "$AIRGEDDON_PLUGINS_ENABLED" = [ "true" ];
 
-        "$scriptfolder" = [ "${placeholder "out"}/lib/airgeddon/" ];
-        "$language_strings_file" = [ "language_strings.sh" ];
+        "$scriptfolder" = [ "" ];
+        #"$language_strings_file" = [ "language_strings.sh" ];
         "$known_pins_dbfile" = [ "known_pins.db" ];
 
         # Thank god there is only one plugin
