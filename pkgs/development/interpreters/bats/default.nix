@@ -16,6 +16,7 @@
 , callPackages
 , symlinkJoin
 , makeWrapper
+, runCommand
 , doInstallCheck ? true
 }:
 
@@ -153,6 +154,32 @@ resholve.mkDerivation rec {
       touch $out
     '';
   });
+  passthru.tests.libraries = runCommand "${bats.name}-with-libraries-test" {} ''
+    cat >test.bats <<EOF
+      setup() {
+        bats_load_library bats-support
+        bats_load_library bats-assert
+
+        bats_require_minimum_version 1.5.0
+
+        # If you need the path to this file
+        # DIR="$( cd "$( dirname "$BATS_TEST_FILENAME" )" >/dev/null 2>&1 && pwd )"
+      }
+
+      @test echo_hi {
+        run -0 echo hi
+        assert_output "hi"
+      }
+
+      @test cp_failure {
+        run ! cp
+        assert_line --index 0 "cp: missing file operand"
+        assert_line --index 1 "Try 'cp --help' for more information."
+      }
+    EOF
+    ${bats.withLibraries (p: [ p.bats-support p.bats-assert ])}/bin/bats test.bats
+    touch $out
+  '';
 
   meta = with lib; {
     homepage = "https://github.com/bats-core/bats-core";
