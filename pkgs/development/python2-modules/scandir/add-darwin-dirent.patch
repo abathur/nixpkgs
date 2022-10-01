@@ -2,11 +2,18 @@ diff --git a/scandir.py b/scandir.py
 index 3f602fb..8456c8e 100644
 --- a/scandir.py
 +++ b/scandir.py
+@@ -26,5 +26,6 @@
+ import collections
+ import sys
++import os
+
+ try:
+     import _scandir
 @@ -432,6 +432,15 @@ elif sys.platform.startswith(('linux', 'darwin', 'sunos5')) or 'bsd' in sys.plat
                      ('__d_padding', ctypes.c_uint8 * 4),
                      ('d_name', ctypes.c_char * 256),
                  )
-+            elif 'darwin' in sys.platform:
++            elif 'darwin' in sys.platform and 'arm64' in os.uname():
 +                _fields_ = (
 +                    ('d_ino', ctypes.c_uint64),
 +                    ('d_off', ctypes.c_uint64),
