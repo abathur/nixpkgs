@@ -117,6 +117,7 @@ let
           "cannot:${getBin systemd}/bin/systemd-cat"
         ];
         fix."$MSMTP" = [ "msmtp" ];
+        fix.ping = true;
         fake.external = [ ]
           ++ optionals stdenv.isLinux [ "ping" ]
           ++ optionals (!withSystemd) [ "systemd-cat" ];
