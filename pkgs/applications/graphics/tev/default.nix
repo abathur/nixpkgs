@@ -49,6 +49,7 @@ stdenv.mkDerivation rec {
     license = licenses.bsd3;
     platforms = platforms.unix;
     badPlatforms = [ "aarch64-linux" ]; # fails on Hydra since forever
+    broken = stdenv.isDarwin; # builds need work
     maintainers = with maintainers; [ ];
   };
 }
