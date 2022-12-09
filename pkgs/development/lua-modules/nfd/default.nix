@@ -1,4 +1,4 @@
-{ fetchFromGitHub, buildLuarocksPackage, lua, pkg-config, lib
+{ stdenv, fetchFromGitHub, buildLuarocksPackage, lua, pkg-config, lib
 , substituteAll, zenity }:
 
 buildLuarocksPackage {
@@ -36,6 +36,7 @@ buildLuarocksPackage {
       "A tiny, neat lua library that portably invokes native file open and save dialogs.";
     homepage = "https://github.com/Alloyed/nativefiledialog/tree/master/lua";
     license = lib.licenses.zlib;
+    broken = stdenv.isDarwin; # builds need work
     maintainers = [ lib.maintainers.scoder12 ];
   };
 }
