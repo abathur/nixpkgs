@@ -1,6 +1,7 @@
 { lib, stdenv, fetchFromGitHub
 , cmake, wrapGAppsHook
 , libX11, libzip, glfw, libpng, xorg, gnome
+, darwin, xcbuild
 }:
 
 stdenv.mkDerivation rec {
@@ -15,9 +16,17 @@ stdenv.mkDerivation rec {
     sha256 = "sha256-NtnnZV/+8aUm8BkUz8Xm3aeSbOI2gNUPNfvYlwUl01Y=";
   };
 
-  nativeBuildInputs = [ cmake wrapGAppsHook ];
+  prePatch = ''
+    substituteInPlace dependencies/nanogui/ext/glfw/src/cocoa_joystick.m \
+      --replace "Kernel/IOKit/hidsystem/IOHIDUsageTables.h" "IOKit/hid/IOHIDUsageTables.h"
+    substituteInPlace dependencies/nanogui/CMakeLists.txt \
+      --replace 'set(NANOGUI_BACKEND_DEFAULT "Metal")' 'set(NANOGUI_BACKEND_DEFAULT "OpenGL")'
+  '';
+
+  nativeBuildInputs = [ cmake wrapGAppsHook xcbuild ];
   buildInputs = [ libX11 libzip glfw libpng ]
-    ++ (with xorg; [ libXrandr libXinerama libXcursor libXi libXxf86vm libXext ]);
+    ++ (with xorg; [ libXrandr libXinerama libXcursor libXi libXxf86vm libXext ])
+    ++ lib.optionals stdenv.isDarwin (with darwin.apple_sdk.frameworks; [ AppKit Cocoa Carbon Foundation IOKit OpenGL ]);
 
   dontWrapGApps = true; # We also need zenity (see below)
 
@@ -49,7 +58,7 @@ stdenv.mkDerivation rec {
     license = licenses.bsd3;
     platforms = platforms.unix;
     badPlatforms = [ "aarch64-linux" ]; # fails on Hydra since forever
-    broken = stdenv.isDarwin; # builds need work
+    # broken = stdenv.isDarwin; # builds need work
     maintainers = with maintainers; [ ];
   };
 }
