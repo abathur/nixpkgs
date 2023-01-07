@@ -1,4 +1,5 @@
-{ coreutils
+{ bash
+, coreutils
 , curl
 , fetchFromGitHub
 , gnugrep
@@ -6,12 +7,11 @@
 , iproute2
 , jq
 , lib
-, makeWrapper
-, stdenv
+, resholve
 , wireguard-tools
 }:
 
-stdenv.mkDerivation rec {
+resholve.mkDerivation rec {
   pname = "wgnord";
   version = "0.1.10";
 
@@ -22,8 +22,6 @@ stdenv.mkDerivation rec {
     hash = "sha256-T7dAEgi4tGvrzBABGLzKHhpCx0bxSCtTVI5iJJqJGlE=";
   };
 
-  nativeBuildInputs = [ makeWrapper ];
-
   postPatch = ''
     substituteInPlace wgnord \
       --replace '$conf_dir/countries.txt' "$out/share/countries.txt" \
@@ -33,10 +31,15 @@ stdenv.mkDerivation rec {
   dontBuild = true;
 
   installPhase = ''
-    install -Dm755 wgnord -t $out/bin/
+    install -Dm 755 wgnord -t $out/bin/
     install -Dm 644 countries.txt -t $out/share/
     install -Dm 644 countries_iso31662.txt -t $out/share/
-    wrapProgram $out/bin/${pname} --prefix PATH : ${lib.makeBinPath [
+  '';
+
+  solutions.wgnord = {
+    scripts = [ "bin/${pname}" ];
+    interpreter = "${bash}/bin/sh";
+    inputs = [
       coreutils
       curl
       gnugrep
@@ -44,8 +47,13 @@ stdenv.mkDerivation rec {
       iproute2
       jq
       wireguard-tools
-    ]}
-  '';
+    ];
+    fix.aliases = true; # curl command in an alias
+    execer = [
+      "cannot:${iproute2}/bin/ip" # only invocation looks benign
+      "cannot:${wireguard-tools}/bin/wg-quick" # all 3 invocations look benign
+    ];
+  };
 
   meta = with lib; {
     description = "A NordVPN Wireguard (NordLynx) client in POSIX shell";
