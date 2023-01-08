@@ -30,7 +30,7 @@ resholve.mkDerivation rec {
   # use whitespace to show osh arithmetic is not file redirection
   patches = [./osh.patch];
 
-  buildPhase = ''
+  postPatch = ''
     substituteInPlace AAXtoMP3 \
       --replace 'GREP="grep"' 'GREP="${gnugrep}/bin/grep"' \
       --replace 'GREP="ggrep"' 'GREP="${gnugrep}/bin/grep"' \
