@@ -32,12 +32,12 @@ resholve.mkDerivation rec {
 
   buildPhase = ''
     substituteInPlace AAXtoMP3 \
-      --replace 'GREP="grep"'                   'GREP="${gnugrep}/bin/grep"' \
-      --replace 'GREP="ggrep"'                  'GREP="${gnugrep}/bin/grep"' \
-      --replace 'FIND="find"'                   'FIND="${findutils}/bin/find"' \
-      --replace 'FIND="gfind"'                  'FIND="${findutils}/bin/find"' \
-      --replace 'SED="sed"'                     'SED="${gnused}/bin/sed"' \
-      --replace 'SED="gsed"'                    'SED="${gnused}/bin/sed"' \
+      --replace 'GREP="grep"' 'GREP="${gnugrep}/bin/grep"' \
+      --replace 'GREP="ggrep"' 'GREP="${gnugrep}/bin/grep"' \
+      --replace 'FIND="find"'  'FIND="${findutils}/bin/find"' \
+      --replace 'FIND="gfind"' 'FIND="${findutils}/bin/find"' \
+      --replace 'SED="sed"' 'SED="${gnused}/bin/sed"' \
+      --replace 'SED="gsed"' 'SED="${gnused}/bin/sed"' \
   '';
 
   installPhase = ''
