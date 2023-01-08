@@ -1,31 +1,22 @@
-{ coreutils
+{ bash
+, bc
+, coreutils
 , fetchFromGitHub
 , ffmpeg
 , findutils
+, gawk
 , gnugrep
 , gnused
 , jq
 , lame
 , lib
-, makeWrapper
 , mediainfo
 , mp4v2
-, stdenv
+, ncurses
+, resholve
 }:
-let
-  runtimeInputs = [
-    coreutils
-    ffmpeg
-    findutils
-    gnugrep
-    gnused
-    jq
-    lame
-    mediainfo
-    mp4v2
-  ];
-in
-stdenv.mkDerivation rec {
+
+resholve.mkDerivation rec {
   pname = "aaxtomp3";
   version = "1.3";
 
@@ -36,16 +27,50 @@ stdenv.mkDerivation rec {
     hash = "sha256-7a9ZVvobWH/gPxa3cFiPL+vlu8h1Dxtcq0trm3HzlQg=";
   };
 
-  dontBuild = false;
+  # use whitespace to show osh arithmetic is not file redirection
+  patches = [./osh.patch];
 
-  nativeBuildInputs = [ makeWrapper ];
+  buildPhase = ''
+    substituteInPlace AAXtoMP3 \
+      --replace 'GREP="grep"'                   'GREP="${gnugrep}/bin/grep"' \
+      --replace 'GREP="ggrep"'                  'GREP="${gnugrep}/bin/grep"' \
+      --replace 'FIND="find"'                   'FIND="${findutils}/bin/find"' \
+      --replace 'FIND="gfind"'                  'FIND="${findutils}/bin/find"' \
+      --replace 'SED="sed"'                     'SED="${gnused}/bin/sed"' \
+      --replace 'SED="gsed"'                    'SED="${gnused}/bin/sed"' \
+  '';
 
   installPhase = ''
-    install -Dm755 AAXtoMP3 $out/bin/aaxtomp3
-    wrapProgram $out/bin/aaxtomp3 --prefix PATH : ${lib.makeBinPath runtimeInputs}
-    install -Dm755 interactiveAAXtoMP3 $out/bin/interactiveaaxtomp3
-    wrapProgram $out/bin/interactiveaaxtomp3 --prefix PATH : ${lib.makeBinPath runtimeInputs}
+    install -Dm 755 AAXtoMP3 $out/bin/aaxtomp3
+    install -Dm 755 interactiveAAXtoMP3 $out/bin/interactiveaaxtomp3
   '';
+
+  solutions.default = {
+    scripts = [
+      "bin/aaxtomp3"
+      "bin/interactiveaaxtomp3"
+    ];
+    interpreter = "${bash}/bin/bash";
+    inputs = [
+      bc
+      coreutils
+      ffmpeg
+      gawk
+      gnugrep
+      gnused
+      jq
+      lame
+      mediainfo
+      mp4v2
+      ncurses
+    ];
+    keep = {
+      "$FIND" = true;
+      "$GREP" = true;
+      "$SED" = true;
+      "$call" = true;
+    };
+  };
 
   meta = with lib; {
     description = "Convert Audible's .aax filetype to MP3, FLAC, M4A, or OPUS";
