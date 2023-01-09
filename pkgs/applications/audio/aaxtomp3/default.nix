@@ -30,16 +30,6 @@ resholve.mkDerivation rec {
   # use whitespace to show osh arithmetic is not file redirection
   patches = [./osh.patch];
 
-  postPatch = ''
-    substituteInPlace AAXtoMP3 \
-      --replace 'GREP="grep"' 'GREP="${gnugrep}/bin/grep"' \
-      --replace 'GREP="ggrep"' 'GREP="${gnugrep}/bin/grep"' \
-      --replace 'FIND="find"'  'FIND="${findutils}/bin/find"' \
-      --replace 'FIND="gfind"' 'FIND="${findutils}/bin/find"' \
-      --replace 'SED="sed"' 'SED="${gnused}/bin/sed"' \
-      --replace 'SED="gsed"' 'SED="${gnused}/bin/sed"' \
-  '';
-
   installPhase = ''
     install -Dm 755 AAXtoMP3 $out/bin/aaxtomp3
     install -Dm 755 interactiveAAXtoMP3 $out/bin/interactiveaaxtomp3
@@ -55,6 +45,7 @@ resholve.mkDerivation rec {
       bc
       coreutils
       ffmpeg
+      findutils
       gawk
       gnugrep
       gnused
@@ -64,11 +55,14 @@ resholve.mkDerivation rec {
       mp4v2
       ncurses
     ];
+    fix = {
+      "$FIND" = [ "find" ];
+      "$GREP" = [ "grep" ];
+      "$SED" = [ "sed" ];
+      "$call" = [ "${placeholder "out"}/bin/aaxtomp3" ];
+    };
     keep = {
-      "$FIND" = true;
-      "$GREP" = true;
-      "$SED" = true;
-      "$call" = true;
+      "${placeholder "out"}/bin/aaxtomp3" = true;
     };
   };
 
