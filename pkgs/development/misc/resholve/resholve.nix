@@ -50,5 +50,6 @@ python27.pkgs.buildPythonApplication {
     license = with licenses; [ mit ];
     maintainers = with maintainers; [ abathur ];
     platforms = platforms.all;
+    knownVulnerabilities = [ "resholve depends on python27 that is EOL" ];
   };
 }
