@@ -10,6 +10,7 @@
 , findutils
 , jq
 , bash
+, removeKnownVulnerabilities
 , bats
 , libressl
 , openssl
@@ -126,7 +127,7 @@ rec {
       cp *.ansi $out/
     '';
     doCheck = true;
-    buildInputs = [ resholve ];
+    buildInputs = [ (removeKnownVulnerabilities resholve) ];
     checkInputs = [ coreutils bats python27 ];
     # LOGLEVEL="DEBUG";
 

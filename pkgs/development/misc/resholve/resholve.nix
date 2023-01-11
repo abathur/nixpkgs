@@ -9,6 +9,7 @@
 , configargparse
 , binlore
 , resholve-utils
+, removeKnownVulnerabilities
 }:
 
 python27.pkgs.buildPythonApplication {
@@ -41,7 +42,7 @@ python27.pkgs.buildPythonApplication {
 
   passthru = {
     inherit (resholve-utils) mkDerivation phraseSolution writeScript writeScriptBin;
-    tests = callPackage ./test.nix { inherit rSrc binlore python27; };
+    tests = callPackage ./test.nix { inherit rSrc binlore python27 removeKnownVulnerabilities; };
   };
 
   meta = with lib; {

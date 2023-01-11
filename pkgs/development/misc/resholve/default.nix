@@ -39,6 +39,7 @@ rec {
     inherit (deps.oil) oildev;
     inherit (deps) configargparse;
     inherit resholve-utils;
+    inherit removeKnownVulnerabilities;
   };
   # funcs to validate and phrase invocations of resholve
   # and use those invocations to build packages
