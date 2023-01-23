@@ -1,27 +1,44 @@
 { lib
-, stdenv
+, resholve
 , fetchFromGitHub
+, bash
+, hostname
+, coreutils
 }:
 
-stdenv.mkDerivation rec {
+resholve.mkDerivation rec {
   pname = "rmate";
   version = "1.0.2";
 
   src = fetchFromGitHub {
     owner = "aurora";
-    repo = "rmate";
+    repo = pname;
     rev = "refs/tags/v${version}";
     hash = "sha256-fmK6h9bqZ0zO3HWfZvPdYuZ6i/0HZ1CA3FUnkS+E9ns=";
   };
 
-  buildPhase = ''
-    true
+  prePatch = ''
+    substituteInPlace rmate --replace '$($(hostname_command))' '$(hostname)'
   '';
 
+  dontBuild = true;
+
   installPhase = ''
-    mkdir -p $out/bin
-    cp -a rmate $out/bin
+    runHook preInstall
+
+    install -Dm755 rmate $out/bin/rmate
+
+    runHook postInstall
   '';
+
+  solutions.default = {
+    scripts = [ "bin/rmate" ];
+    interpreter = "${bash}/bin/bash";
+    inputs = [
+      hostname
+      coreutils
+    ];
+  };
 
   meta = with lib; {
     description = "Remote TextMate 2 implemented as shell script";
