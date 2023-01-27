@@ -10,19 +10,32 @@ stdenv.mkDerivation rec {
   version = "0.14.0";
 
   src = fetchurl {
-    url = "https://www.oilshell.org/download/oil-${version}.tar.xz";
-    hash = "sha256-ZrT2vHfbc0S9Q9e9lDiyptfSC3CIiQs8Co9FODil7oY=";
+    url = "https://www.oilshell.org/download/oils-for-unix-${version}.tar.xz";
+    hash = "sha256-whDePPsRsWasKotbmC6XViz4t2VNRwM8vNUbjTkvogc=";
   };
 
   postPatch = ''
-    patchShebangs build
+    patchShebangs build _build
     # TODO: workaround for https://github.com/oilshell/oil/issues/1467
     #       check for removability on updates :)
     substituteInPlace configure --replace "echo '#define HAVE_READLINE 1'" "echo '#define HAVE_READLINE 1' && return 0"
   '';
 
-  preInstall = ''
+  buildPhase = ''
+    runHook preBuild
+
+    _build/oils.sh "" "" SKIP_REBUILD
+
+    runHook postBuild
+  '';
+
+  installPhase = ''
+    runHook preInstall
+
     mkdir -p $out/bin
+    ./install
+
+    runHook postInstall
   '';
 
   strictDeps = true;
