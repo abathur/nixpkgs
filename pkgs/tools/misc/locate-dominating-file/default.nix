@@ -2,13 +2,14 @@
 , bash
 , fetchFromGitHub
 , lib
-, stdenvNoCC
+, resholve
+, coreutils
 , getopt
 }:
 let
   version = "0.0.1";
 in
-stdenvNoCC.mkDerivation {
+resholve.mkDerivation {
   pname = "locate-dominating-file";
   inherit version;
   src = fetchFromGitHub {
@@ -46,6 +47,15 @@ stdenvNoCC.mkDerivation {
 
     runHook postInstall
   '';
+
+  solutions.default = {
+    scripts = [ "bin/locate-dominating-file" ];
+    interpreter = "${bash}/bin/bash";
+    inputs = [
+      coreutils
+      getopt
+    ];
+  };
 
   meta = with lib; {
     homepage = "https://github.com/roman/locate-dominating-file";
