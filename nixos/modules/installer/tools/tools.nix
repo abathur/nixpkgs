@@ -17,16 +17,23 @@ let
     inherit (pkgs) runtimeShell;
   };
 
-  nixos-install = makeProg {
-    name = "nixos-install";
-    src = ./nixos-install.sh;
-    inherit (pkgs) runtimeShell;
-    nix = config.nix.package.out;
-    path = makeBinPath [
+  nixos-install = pkgs.resholve.writeScriptBin "nixos-install" {
+    interpreter = pkgs.runtimeShell;
+    inputs = [
       pkgs.jq
       nixos-enter
+      config.nix.package.out
+      pkgs.man
+      pkgs.coreutils
     ];
-  };
+    execer = [
+      "cannot:${config.nix.package.out}/bin/nix"
+      "cannot:${config.nix.package.out}/bin/nix-env"
+      "cannot:${config.nix.package.out}/bin/nix-build"
+      # blatant lie; nixos-enter obviously execs its args
+      "cannot:${nixos-enter}/bin/nixos-enter"
+    ];
+  } (builtins.readFile ./nixos-install.sh);
 
   nixos-rebuild = pkgs.nixos-rebuild.override { nix = config.nix.package.out; };
 
