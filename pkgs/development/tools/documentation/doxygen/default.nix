@@ -1,4 +1,4 @@
-{ lib, stdenv, cmake, fetchFromGitHub, python3, flex, bison, qt5, CoreServices, libiconv }:
+{ lib, stdenv, cmake, fetchFromGitHub, python3, flex, bison, qt5, CoreServices, libiconv, sqlite }:
 
 stdenv.mkDerivation rec {
   pname = "doxygen";
@@ -18,12 +18,12 @@ stdenv.mkDerivation rec {
     bison
   ];
 
-  buildInputs = [ libiconv ]
+  buildInputs = [ libiconv sqlite.dev ]
     ++ lib.optionals (qt5 != null) (with qt5; [ qtbase wrapQtAppsHook ])
     ++ lib.optionals stdenv.isDarwin [ CoreServices ];
 
   cmakeFlags =
-    [ "-DICONV_INCLUDE_DIR=${libiconv}/include" ] ++
+    [ "-DICONV_INCLUDE_DIR=${libiconv}/include" "-Duse_sqlite3=ON" ] ++
     lib.optional (qt5 != null) "-Dbuild_wizard=YES";
 
   env.NIX_CFLAGS_COMPILE =
