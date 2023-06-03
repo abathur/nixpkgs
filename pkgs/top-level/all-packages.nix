@@ -18346,7 +18346,14 @@ with pkgs;
 
   dot2tex = with python3.pkgs; toPythonApplication dot2tex;
 
-  doxygen = darwin.apple_sdk_11_0.callPackage ../development/tools/documentation/doxygen {
+  winPkgs = import <nixpkgs> {
+    crossSystem = {
+      config = "x86_64-w64-mingw32";
+      isStatic = true;
+    };
+  };
+  doxygen = winPkgs.callPackage ../development/tools/documentation/doxygen {
+    stdenv = gcc13Stdenv;
     qt5 = null;
     inherit (darwin.apple_sdk_11_0.frameworks) CoreServices;
   };

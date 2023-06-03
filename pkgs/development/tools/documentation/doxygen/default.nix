@@ -9,6 +9,7 @@
 , CoreServices
 , libiconv
 , withSqlite ? true, sqlite
+, windows
 }:
 
 stdenv.mkDerivation rec {
@@ -32,7 +33,8 @@ stdenv.mkDerivation rec {
   buildInputs = [ libiconv ]
     ++ lib.optionals withSqlite [ sqlite ]
     ++ lib.optionals (qt5 != null) (with qt5; [ qtbase wrapQtAppsHook ])
-    ++ lib.optionals stdenv.isDarwin [ CoreServices ];
+    ++ lib.optionals stdenv.isDarwin [ CoreServices ]
+    ++ lib.optionals stdenv.targetPlatform.isWindows [ windows.mcfgthreads ];
 
   cmakeFlags = [ "-DICONV_INCLUDE_DIR=${libiconv}/include" ]
     ++ lib.optional withSqlite "-Duse_sqlite3=ON"
