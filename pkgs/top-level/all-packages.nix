@@ -25158,7 +25158,7 @@ with pkgs;
 
   speechd = callPackage ../development/libraries/speechd { };
 
-  speech-tools = callPackage ../development/libraries/speech-tools {
+  speech-tools = darwin.apple_sdk_11_0.callPackage ../development/libraries/speech-tools {
     inherit (darwin.apple_sdk.frameworks) CoreServices AudioUnit Cocoa;
   };
 
