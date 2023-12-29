@@ -50,7 +50,7 @@ stdenv.mkDerivation rec {
     ./gnu-install-dirs.patch
     (fetchpatch {
       url = "https://github.com/llvm/llvm-project/commit/efcee4b06d2f8ee6c79dd893b702f073593d5823.patch";
-      sha256 = "1hppxqMiH8Ksc9B2e3AXighfM6KVN+RNXYL+fLELSN8=";
+      hash = "sha256-B5KDeX9fdXxzWcarMZIqKv2AN0NpMklfJrmULjO/VUc=";
       revert = true;
     })
   ];
