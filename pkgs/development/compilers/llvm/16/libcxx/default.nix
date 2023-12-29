@@ -11,6 +11,7 @@
 # Some context:
 # https://reviews.llvm.org/rG1687f2bbe2e2aaa092f942d4a97d41fad43eedfb
 , headersOnly ? false
+, fetchpatch
 }:
 
 let
@@ -47,6 +48,11 @@ stdenv.mkDerivation rec {
 
   patches = [
     ./gnu-install-dirs.patch
+    (fetchpatch {
+      url = "https://github.com/llvm/llvm-project/commit/efcee4b06d2f8ee6c79dd893b702f073593d5823.patch";
+      sha256 = "1hppxqMiH8Ksc9B2e3AXighfM6KVN+RNXYL+fLELSN8=";
+      revert = true;
+    })
   ];
 
   postPatch = ''
@@ -73,6 +79,7 @@ stdenv.mkDerivation rec {
   in [
     "-DLLVM_ENABLE_RUNTIMES=libcxx"
     "-DLIBCXX_CXX_ABI=${if headersOnly then "none" else libcxx_cxx_abi_opt}"
+    "-DLIBCXX_LIBCPPABI_VERSION=2"
   ] ++ lib.optional (!headersOnly && cxxabi.libName == "c++abi") "-DLIBCXX_CXX_ABI_INCLUDE_PATHS=${cxxabi.dev}/include/c++/v1"
     ++ lib.optional (stdenv.hostPlatform.isMusl || stdenv.hostPlatform.isWasi) "-DLIBCXX_HAS_MUSL_LIBC=1"
     ++ lib.optionals (stdenv.hostPlatform.useLLVM or false) [
