@@ -73,7 +73,7 @@ stdenv.mkDerivation rec {
   in [
     "-DLLVM_ENABLE_RUNTIMES=libcxx"
     "-DLIBCXX_CXX_ABI=${if headersOnly then "none" else libcxx_cxx_abi_opt}"
-    "-DLIBCXX_ABI_NAMESPACE=__nix${toString version}"
+    "-DLIBCXX_ABI_NAMESPACE=__nix16"
   ] ++ lib.optional (!headersOnly && cxxabi.libName == "c++abi") "-DLIBCXX_CXX_ABI_INCLUDE_PATHS=${cxxabi.dev}/include/c++/v1"
     ++ lib.optional (stdenv.hostPlatform.isMusl || stdenv.hostPlatform.isWasi) "-DLIBCXX_HAS_MUSL_LIBC=1"
     ++ lib.optionals (stdenv.hostPlatform.useLLVM or false) [
