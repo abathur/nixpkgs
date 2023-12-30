@@ -34,6 +34,7 @@ stdenv.mkDerivation rec {
 
   cmakeFlags = [
     "-DLLD_INSTALL_PACKAGE_DIR=${placeholder "dev"}/lib/cmake/lld"
+    "-DLIBCXX_ABI_NAMESPACE=__nix16"
   ] ++ lib.optionals (stdenv.hostPlatform != stdenv.buildPlatform) [
     "-DLLVM_TABLEGEN_EXE=${buildLlvmTools.llvm}/bin/llvm-tblgen"
   ];
