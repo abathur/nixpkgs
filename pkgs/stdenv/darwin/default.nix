@@ -870,8 +870,8 @@ in
 
       darwin = super.darwin.overrideScope (selfDarwin: superDarwin: {
         inherit (prevStage.darwin)
-          Libsystem configd darwin-stubs launchd locale print-reexports rewrite-tbd
-          signingUtils sigtool;
+          Libsystem cctools cctools-llvm cctools-port configd darwin-stubs launchd locale
+          print-reexports rewrite-tbd signingUtils sigtool;
 
         # Rewrap binutils so it uses the rebuilt Libsystem.
         binutils = superDarwin.binutils.override {
@@ -882,9 +882,6 @@ in
         } // {
           passthru = { inherit (prevStage.bintools.passthru) isFromBootstrapFiles; };
         };
-
-        # Avoid building unnecessary Python dependencies due to building LLVM manpages.
-        cctools-llvm = superDarwin.cctools-llvm.override { enableManpages = false; };
       });
 
       llvmPackages = super.llvmPackages // (
@@ -960,10 +957,10 @@ in
     ]);
 
     assert lib.all isBuiltByBootstrapFilesCompiler (with prevStage.darwin; [
-      locale print-reexports rewrite-tbd sigtool
+      cctools locale print-reexports rewrite-tbd sigtool
     ]);
     assert lib.all isBuiltByNixpkgsCompiler (with prevStage.darwin; [
-      binutils-unwrapped cctools libtapi
+      binutils-unwrapped libtapi
     ]);
 
     assert (! useAppleSDKLibs) -> lib.all isBuiltByBootstrapFilesCompiler (with prevStage.darwin; [ configd ]);
@@ -999,9 +996,12 @@ in
 
       darwin = super.darwin.overrideScope (selfDarwin: superDarwin: {
         inherit (prevStage.darwin)
-          CF Libsystem binutils binutils-unwrapped cctools cctools-llvm cctools-port configd
+          CF Libsystem binutils binutils-unwrapped configd
           darwin-stubs dyld launchd libclosure libdispatch libobjc libtapi locale objc4
           postLinkSignHook print-reexports rewrite-tbd signingUtils sigtool;
+
+        # Avoid building unnecessary Python dependencies due to building LLVM manpages.
+        cctools-llvm = superDarwin.cctools-llvm.override { enableManpages = false; };
       });
 
       llvmPackages = super.llvmPackages // (
