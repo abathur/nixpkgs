@@ -74,6 +74,8 @@ stdenv.mkDerivation rec {
     "-DLLVM_ENABLE_RUNTIMES=libcxx"
     "-DLIBCXX_CXX_ABI=${if headersOnly then "none" else libcxx_cxx_abi_opt}"
   ] ++ lib.optional (!headersOnly && cxxabi.libName == "c++abi") "-DLIBCXX_CXX_ABI_INCLUDE_PATHS=${cxxabi.dev}/include/c++/v1"
+    # Avoid conflicts with the system libc++ on Darwin.
+    ++ lib.optional stdenv.hostPlatform.isDarwin "-DLIBCXX_OSX_REEXPORT_LIBCXXABI_SYMBOLS=ON"
     ++ lib.optional (stdenv.hostPlatform.isMusl || stdenv.hostPlatform.isWasi) "-DLIBCXX_HAS_MUSL_LIBC=1"
     ++ lib.optionals (stdenv.hostPlatform.useLLVM or false) [
       "-DLIBCXX_USE_COMPILER_RT=ON"
