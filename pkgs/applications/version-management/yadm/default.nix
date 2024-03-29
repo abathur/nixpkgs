@@ -56,6 +56,15 @@ resholve.mkDerivation rec {
       --bash completion/bash/yadm
   '';
 
+  lore = {
+    execer = [
+      "can:${placeholder out}/bin/yadm"
+    ];
+    wrapper = [
+      "${placeholder out}/bin/yadm:${placeholder out}/bin/sadm"
+    ];
+  };
+
   solutions = {
     yadm = {
       scripts = [ "bin/yadm" ];

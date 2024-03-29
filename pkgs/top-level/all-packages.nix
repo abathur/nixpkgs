@@ -1338,6 +1338,19 @@ with pkgs;
 
   ociTools = callPackage ../build-support/oci-tools { };
 
+  # DOING
+  overrideLore = makeSetupHook {
+    name = "override-lore-hook";
+    propagatedBuildInputs = [ dieHook ];
+    substitutions = {
+      # targetPackages.runtimeShell only exists when pkgs == targetPackages (when targetPackages is not  __raw)
+      shell = if targetPackages ? runtimeShell then targetPackages.runtimeShell else throw "makeWrapper/makeShellWrapper must be in nativeBuildInputs";
+    };
+    # passthru = {
+    #   tests = tests.makeWrapper;
+    # };
+  } ../build-support/setup-hooks/override-lore.sh;
+
   inherit (
     callPackages ../build-support/setup-hooks/patch-rc-path-hooks { }
   ) patchRcPathBash patchRcPathCsh patchRcPathFish patchRcPathPosix;
