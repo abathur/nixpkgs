@@ -5,6 +5,8 @@
 , nixos
 , testers
 , hello
+, binlore
+, makeWrapper
 }:
 
 stdenv.mkDerivation (finalAttrs: {
@@ -18,6 +20,14 @@ stdenv.mkDerivation (finalAttrs: {
 
   doCheck = true;
 
+  nativeBuildInputs = [ makeWrapper ];
+
+  postInstall = ''
+    makeWrapper $out/bin/hello $out/bin/jello --set FOOBAR baz
+    mkdir -p $out/nix-support
+    echo "fakelore:bin/hello" > $out/nix-support/execers
+  '';
+
   passthru.tests = {
     version = testers.testVersion { package = hello; };
 
@@ -29,6 +39,22 @@ stdenv.mkDerivation (finalAttrs: {
   };
 
   passthru.tests.run = callPackage ./test.nix { hello = finalAttrs.finalPackage; };
+
+  # passthru.lore = (binlore.synthesize finalAttrs.finalPackage {
+  #   execer = [
+  #     "can:bin/*"
+  #     "cannot:bin/jello"
+  #   ];
+  #   wrapper = [
+  #     "bin/hello:bin/jello"
+  #   ];
+  # });
+  passthru.lore = (binlore.synthesize finalAttrs.finalPackage ''
+    execer can bin/*
+    execer can bin/hello
+    wrapper bin/hello bin/jello
+  '');
+  passthru.hehe = (binlore.collect { drvs = [ finalAttrs.finalPackage ]; });
 
   meta = with lib; {
     description = "A program that produces a familiar, friendly greeting";

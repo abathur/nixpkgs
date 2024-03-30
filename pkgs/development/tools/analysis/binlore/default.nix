@@ -55,39 +55,19 @@ let
     #   in here, but I'm erring on the side of flexibility
     #   since this form will make it easier to pilot other
     #   uses of binlore.
-    callback = lore: drv: overrides: ''
+    callback = lore: drv: ''
       if [[ -d "${drv}/bin" ]] || [[ -d "${drv}/lib" ]] || [[ -d "${drv}/libexec" ]]; then
         echo generating binlore for $drv by running:
         echo "${pkgsBuildBuild.yara}/bin/yara --scan-list --recursive ${lore.rules} <(printf '%s\n' ${drv}/{bin,lib,libexec}) | ${pkgsBuildBuild.yallback}/bin/yallback ${lore.yallback}"
       else
         echo "failed to generate binlore for $drv (none of ${drv}/{bin,lib,libexec} exist)"
       fi
-    '' +
-    /*
-    Override lore for some packages. Unsure, but for now:
-    1. start with the ~name (pname-version)
-    2. remove characters from the end until we find a match
-       in overrides/
-    3. execute the override script with the list of expected
-       lore types
-    */
-    ''
-      i=''${#identifier}
-      filter=
-      while [[ $i > 0 ]] && [[ -z "$filter" ]]; do
-        if [[ -f "${overrides}/''${identifier:0:$i}" ]]; then
-          filter="${overrides}/''${identifier:0:$i}"
-          echo using "${overrides}/''${identifier:0:$i}" to generate overriden binlore for $drv
-          break
-        fi
-        ((i--)) || true # don't break build
-      done # || true # don't break build
+
       if [[ -d "${drv}/bin" ]] || [[ -d "${drv}/lib" ]] || [[ -d "${drv}/libexec" ]]; then
-        ${pkgsBuildBuild.yara}/bin/yara --scan-list --recursive ${lore.rules} <(printf '%s\n' ${drv}/{bin,lib,libexec}) | ${pkgsBuildBuild.yallback}/bin/yallback ${lore.yallback} "$filter"
+        ${pkgsBuildBuild.yara}/bin/yara --scan-list --recursive ${lore.rules} <(printf '%s\n' ${drv}/{bin,lib,libexec}) | ${pkgsBuildBuild.yallback}/bin/yallback ${lore.yallback}
       fi
     '';
   };
-  overrides = (src + "/overrides");
 
 in rec {
   collect = { lore ? loreDef, drvs, strip ? [ ] }: (runCommand "more-binlore" { } ''
@@ -99,14 +79,72 @@ in rec {
   '');
   # TODO: echo for debug, can be removed at some point
   make = lore: drv: runCommand "${drv.name}-binlore" {
-      identifier = drv.name;
       drv = drv;
     } (''
     mkdir $out
     touch $out/{${builtins.concatStringsSep "," lore.types}}
 
-    ${lore.callback lore drv overrides}
+    ${lore.callback lore drv}
+    '' + lib.optionalString (builtins.hasAttr "lore" drv)
+    # Append lore passed in the package's $out and drv.lore (last entry wins)
+    ''
 
+    if [[ -f "${drv}/nix-support/execers" ]]; then
+      cat "${drv}/nix-support/execers" >> "$out/execers"
+    fi
+    if [[ -f "${drv.lore}/execers" ]]; then
+      cat "${drv.lore}/execers" >> "$out/execers"
+    fi
+
+    if [[ -f "${drv}/nix-support/wrappers" ]]; then
+      cat "${drv}/nix-support/wrappers" >> "$out/wrappers"
+    fi
+    if [[ -f "${drv.lore}/wrappers" ]]; then
+      cat "${drv.lore}/wrappers" >> "$out/wrappers"
+    fi
+  '' + ''
     echo binlore for $drv written to $out
   '');
+  synthesize = drv: lore: runCommand "${drv.name}-lore-override" {
+    drv = drv;
+  } (''
+    execer(){
+      local verdict="$1"
+
+      shift
+
+      for path in "$@"; do
+        if [[ -e "$path" ]]; then
+          echo "$verdict:$path"
+        else
+          echo "error: Tried to synthesize execer lore for missing file: $path (pwd: $PWD)" >&2
+          exit 2
+        fi
+      done
+    } >> $out/execers
+
+    wrapper(){
+      local wrapper="$1"
+      local original="$2"
+
+      if [[ ! -e "$wrapper" ]]; then
+        echo "error: Tried to synthesize wrapper lore for missing wrapper: $wrapper (pwd: $PWD)" >&2
+        exit 2
+      fi
+
+      if [[ ! -e "$original" ]]; then
+        echo "error: Tried to synthesize wrapper lore for missing original: $original (pwd: $PWD)" >&2
+        exit 2
+      fi
+
+      echo "$wrapper:$original"
+
+    } >> $out/wrappers
+
+    mkdir $out
+
+    # lore override commands are relative to the drv root
+    cd $drv
+
+  '' + lore);
 }
