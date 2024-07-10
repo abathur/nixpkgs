@@ -10,8 +10,6 @@
 , lib
 , nixosTests
 , installShellFiles
-, binlore
-, nixos-rebuild
 }:
 let
   fallback = import ./../../../../nixos/modules/installer/tools/nix-fallback-paths.nix;
@@ -50,13 +48,6 @@ substitute {
     specialisations = nixosTests.nixos-rebuild-specialisations;
     target-host = nixosTests.nixos-rebuild-target-host;
   };
-
-  # nixos-rebuild can’t execute its arguments
-  # (but it can run ssh with the with the options stored in $NIX_SSHOPTS,
-  # and ssh can execute its arguments...)
-  passthru.binlore.out = binlore.synthesize nixos-rebuild ''
-    execer cannot bin/nixos-rebuild
-  '';
 
   meta = {
     description = "Rebuild your NixOS configuration and switch to it, on local hosts and remote";

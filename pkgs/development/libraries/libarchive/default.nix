@@ -23,9 +23,6 @@
 , cmake
 , nix
 , samba
-
-# for passthru.lore
-, binlore
 }:
 
 assert xarSupport -> libxml2 != null;
@@ -128,11 +125,4 @@ stdenv.mkDerivation (finalAttrs: {
   passthru.tests = {
     inherit cmake nix samba;
   };
-
-  # bsdtar is detected as "cannot" because its exec is internal to
-  # calls it makes into libarchive itself. If binlore gains support
-  # for detecting another layer down into libraries, this can be cut.
-  passthru.binlore.out = binlore.synthesize finalAttrs.finalPackage ''
-    execer can bin/bsdtar
-  '';
 })

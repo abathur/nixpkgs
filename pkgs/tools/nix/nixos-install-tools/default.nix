@@ -8,7 +8,6 @@
   nixos-install-tools,
   runCommand,
   nixosTests,
-  binlore,
 }:
 let
   inherit (nixos {}) config;
@@ -63,12 +62,6 @@ in
       touch $out
     '';
   };
-
-  # no documented flags show signs of exec; skim of source suggests
-  # it's just --help execing man
-  passthru.binlore.out = binlore.synthesize nixos-install-tools ''
-    execer cannot bin/nixos-generate-config
-  '';
 }).overrideAttrs {
   inherit version;
   pname = "nixos-install-tools";
