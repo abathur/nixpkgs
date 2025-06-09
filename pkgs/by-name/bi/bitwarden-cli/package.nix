@@ -30,7 +30,7 @@ buildNpmPackage rec {
   npmDepsHash = "sha256-5neEpU7ZhVO5OR181owsvAnFfl7lr0MymvqbRFCPs3M=";
 
   nativeBuildInputs = [
-    python3
+    (python3.withPackages(ps: [ps.setuptools]))
   ] ++ lib.optionals stdenv.isDarwin [
     cctools
     xcbuild.xcrun
