@@ -1,0 +1,35 @@
+From ca37b38356d843454da7b7e45ac04ac2140d9794 Mon Sep 17 00:00:00 2001
+From: "Travis A. Everett" <travis.a.everett@gmail.com>
+Date: Sat, 21 Jun 2025 10:31:22 -0500
+Subject: work around osh parse error on regex w/ space
+
+osh (parser underlying resholve) can't parse these unless we
+extract them into a variable
+---
+ podget | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/podget b/podget
+index 17101d2..ffa649d 100755
+--- a/podget
++++ b/podget
+@@ -1307,12 +1307,14 @@ FilterOptions() {
+         printf -v "${FILTER_ITEM}" '%s' "${!FILTER_ITEM/ATOM_FILTER_SIMPLE}"
+     fi
+ 
+-    if [[ "${!FILTER_ITEM}" =~ ^(.+[[:space:]]|[[:space:]]?)(ATOM_FILTER_TYPE=\"?)([^\" ]+).*$ ]]; then
++    local atom_filter_type_pat='^(.+[[:space:]]|[[:space:]]?)(ATOM_FILTER_TYPE=\"?)([^\" ]+).*$'
++    if [[ "${!FILTER_ITEM}" =~ $atom_filter_type_pat ]]; then
+         ATOM_FILTER_TYPE="${BASH_REMATCH[3]}"
+         printf -v "${FILTER_ITEM}" '%s' "${!FILTER_ITEM/ATOM_FILTER_TYPE=+([^[:space:]])}"
+     fi
+ 
+-    if [[ "${!FILTER_ITEM}" =~ ^(.+[[:space:]]|[[:space:]]?)(ATOM_FILTER_LANG=\"?)([^\" ]+).*$ ]]; then
++    local atom_filter_lang_pat='^(.+[[:space:]]|[[:space:]]?)(ATOM_FILTER_LANG=\"?)([^\" ]+).*$'
++    if [[ "${!FILTER_ITEM}" =~ $atom_filter_lang_pat ]]; then
+         ATOM_FILTER_LANG="${BASH_REMATCH[3]}"
+         printf -v "${FILTER_ITEM}" '%s' "${!FILTER_ITEM/ATOM_FILTER_LANG=+([^[:space:]])}"
+     fi
+-- 
+2.43.0
+

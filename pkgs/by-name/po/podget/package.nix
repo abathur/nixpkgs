@@ -21,6 +21,8 @@ resholve.mkDerivation {
     hash = "sha256-0I42UPWTdSzfRJodB1v3BNI5vwt8GRGpHR7eACoR9YQ=";
   };
 
+  patches = [ ./extract_regexes_with_spaces.patch ];
+
   dontConfigure = true;
   dontBuild = true;
 
