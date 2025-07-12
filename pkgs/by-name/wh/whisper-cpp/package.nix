@@ -11,6 +11,7 @@
   which,
   autoAddDriverRunpath,
   makeWrapper,
+  libarchive,
 
   metalSupport ? stdenv.hostPlatform.isDarwin && stdenv.hostPlatform.isAarch64,
   coreMLSupport ? stdenv.hostPlatform.isDarwin && false, # FIXME currently broken
@@ -160,6 +161,11 @@ effectiveStdenv.mkDerivation (finalAttrs: {
 
     wrapProgram "$out/bin/whisper-cpp-download-ggml-model" \
       --prefix PATH : ${lib.makeBinPath [ wget ]}
+  '' + lib.optionalString stdenv.isDarwin ''
+    install -v -D -m755 "$src/models/download-coreml-model.sh" "$out/bin/whisper-cpp-download-coreml-model"
+
+    wrapProgram $out/bin/whisper-cpp-download-coreml-model \
+      --prefix PATH : ${lib.makeBinPath [wget libarchive]}
   '';
 
   requiredSystemFeatures = optionals rocmSupport [ "big-parallel" ]; # rocmSupport multiplies build time by the number of GPU targets, which takes arround 30 minutes on a 16-cores system to build
